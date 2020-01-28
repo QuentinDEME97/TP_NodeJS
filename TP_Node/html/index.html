@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8" />
+    <title>Socket.io</title>
+    <script src="/socket.io/socket.io.js"></script>
+    <link rel="stylesheet" type="text/css" href="/assets/semantic/semantic.min.css">
+    <link rel="stylesheet" href="/style/style.css">
+    <script src="https://code.jquery.com/jquery-3.1.1.min.js"
+        integrity="sha256-hVVnYaiADRTO2PzUGmuLJr8BLUSjGIZsDYGmIJLv2b8=" crossorigin="anonymous"></script>
+    <script src="/assets/semantic/semantic.min.js"></script>
+</head>
+
+<body>
+    <h1>Communication avec socket.io !</h1>
+    <div class="conversation-container">
+        <div class="main-conv" id="main-conv">
+
+        </div>
+        <div class="form-container">
+            <div class="ui grid">
+                <div class="three wide column">
+                    <div class="ui fluid selection dropdown">
+                        <input type="hidden" name="user" id="user-selector">
+                        <i class="dropdown icon"></i>
+                        <div class="default text">Envoyer en tant que</div>
+                        <div class="menu">
+                            <div class="item" data-value="kristy">
+                                <img class="ui mini avatar image" src="/assets/images/kristy.png">
+                                Kristy
+                            </div>
+                            <div class="item" data-value="matthew">
+                                <img class="ui mini avatar image" src="/assets/images/matthew.png">
+                                Matthew
+                            </div>
+                            <div class="item" data-value="joe">
+                                <img class="ui mini avatar image" src="/assets/images/joe.png">
+                                Joe
+                            </div>
+                            <div class="item" data-value="dp">
+                                <img class="ui mini avatar image" src="/assets/images/dp.png">
+                                David
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="eleven wide column">
+                    <div class="ui form">
+                        <div class="field">
+                            <input type="text" id="message-container">
+                        </div>
+                    </div>
+                </div>
+                <div class="two wide column">
+                    <button class="ui button middle aligned" id="send-button">
+                        <i class="paper plane icon"></i> Envoyer
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        $('.ui.dropdown').dropdown();
+        var socket = io.connect('http://localhost:8080');
+
+        socket.on('reload', function (data) {
+            console.log("Je reçois un ordre de reload")
+            location.reload();
+        });
+
+        socket.on('message', function (data) {
+            console.log(data)
+            document.getElementById('main-conv').innerHTML = ""
+            data.forEach(message => {
+                let author = ""
+                if (message.author == "dp") {
+                    author = "David"
+                } else {
+                    author = message.author
+                }
+                document.getElementById('main-conv').innerHTML += "<div class='ui cards'><div class='card message-card'><div class='content'><img class='right floated mini ui image' src='/assets/images/" + message.author + ".png'><div class='header'>" + author + "</div><div class='meta'>"+message.date+"</div><div class='description'>" + message.message + "</div></div></div></div>"
+            });
+            // 'received from the server:' + data + '<br/>';
+        });
+
+        document.getElementById("send-button").addEventListener("click", (MouseEvent) => {
+            let message = document.getElementById("message-container").value
+            let author = document.getElementById("user-selector").value
+            let date = new Date;
+            let hour = date.getHours()
+            let minutes = date.getMinutes()
+            let datestr = hour.toString() + ":" + minutes.toString()
+            socket.emit('message', { "message": message, "author": author, "date" : datestr})
+            document.getElementById("message-container").value = "";
+        })
+        socket.emit('ready')
+    </script>
+</body>
+
+</html>

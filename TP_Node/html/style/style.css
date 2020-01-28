@@ -1,0 +1,43 @@
+h1 {
+    text-align: center;
+}
+
+.conversation-container {
+    background-color: #eeeeee;
+    width: 80%;
+    box-sizing: border-box;
+    
+}
+
+html,
+body {
+  height: 100%;
+  margin: 0
+}
+
+.conversation-container {
+  position: relative;
+  display: flex;
+  flex-flow: column;
+  height: 90%;
+  display: block;
+  margin: auto;
+  border-radius: 10px;
+  padding: 2rem;
+}
+
+.form-container {
+  position: absolute;
+  bottom: 2rem;
+  width: 95%;
+}
+
+.ui.grid {
+  width: 100%;
+}
+
+.ui.cards > .message-card {
+  width: 50%;
+  /* display: block;
+  margin: auto; */
+}
