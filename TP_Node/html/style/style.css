@@ -38,6 +38,14 @@ body {
 
 .ui.cards > .message-card {
   width: 50%;
+  margin-left: 0.6rem;
   /* display: block;
   margin: auto; */
+}
+
+.main-conv {
+  height: inherit;
+  overflow-y: scroll;
+  overflow-x: hidden;
+  scroll-behavior: smooth;
 }

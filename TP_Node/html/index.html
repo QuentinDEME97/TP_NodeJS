@@ -19,8 +19,8 @@
 
         </div>
         <div class="form-container">
-            <div class="ui grid">
-                <div class="three wide column">
+            <div class="ui equal width grid">
+                <div class="column">
                     <div class="ui fluid selection dropdown">
                         <input type="hidden" name="user" id="user-selector">
                         <i class="dropdown icon"></i>
@@ -45,14 +45,14 @@
                         </div>
                     </div>
                 </div>
-                <div class="eleven wide column">
+                <div class="eight wide column">
                     <div class="ui form">
                         <div class="field">
                             <input type="text" id="message-container">
                         </div>
                     </div>
                 </div>
-                <div class="two wide column">
+                <div class="four wide column">
                     <button class="ui button middle aligned" id="send-button">
                         <i class="paper plane icon"></i> Envoyer
                     </button>
@@ -65,6 +65,7 @@
         $('.ui.dropdown').dropdown();
         var socket = io.connect('http://localhost:8080');
 
+        // Non utilisé mais le serveur peut forcer un reload de la page
         socket.on('reload', function (data) {
             console.log("Je reçois un ordre de reload")
             location.reload();
@@ -80,9 +81,10 @@
                 } else {
                     author = message.author
                 }
-                document.getElementById('main-conv').innerHTML += "<div class='ui cards'><div class='card message-card'><div class='content'><img class='right floated mini ui image' src='/assets/images/" + message.author + ".png'><div class='header'>" + author + "</div><div class='meta'>"+message.date+"</div><div class='description'>" + message.message + "</div></div></div></div>"
+                document.getElementById('main-conv').innerHTML += "<div class='ui cards'><div class='card message-card'><div class='content'><img class='right floated mini ui image' src='/assets/images/" + message.author + ".png'><div class='header'>" + author + "</div><div class='meta'>" + message.date + "</div><div class='description'>" + message.message + "</div></div></div></div>"
             });
-            // 'received from the server:' + data + '<br/>';
+            let conv_container = document.getElementById('main-conv');
+            conv_container.scrollTop = conv_container.scrollHeight - conv_container.clientHeight;
         });
 
         document.getElementById("send-button").addEventListener("click", (MouseEvent) => {
@@ -92,7 +94,7 @@
             let hour = date.getHours()
             let minutes = date.getMinutes()
             let datestr = hour.toString() + ":" + minutes.toString()
-            socket.emit('message', { "message": message, "author": author, "date" : datestr})
+            socket.emit('message', { "message": message, "author": author, "date": datestr })
             document.getElementById("message-container").value = "";
         })
         socket.emit('ready')

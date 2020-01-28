@@ -26,36 +26,40 @@ app.get('/*', function (req, res) {
 
 var port = 8080;
 console.success("listening to " + port);
+/* ========== */
 var io = require('socket.io').listen(app.listen(port), { log: true });
 let date = new Date;
 let hour = date.getHours()
 let minutes = date.getMinutes()
 let datestr = hour.toString() + ":" + minutes.toString()
+/* ============= */
+
+/* Création du premier message du serveur.
+ On utilise une liste pour avoir un historique à fournir si un nouveau
+client se connecte. */
 var messages = [{ "message": "Bienvenue !", "author": "server", "date": datestr}];
+// Set pour contenir les clients connectés aux serveurs
 clients = {};
-// when the client is ready
+// Quand le client est prêt
 io.sockets.on('connection', function (socket) {
+    // La socket reçoit un ready
     socket.on('ready', function (data) {
         console.received('received', 'ack');
+        // On transmet les messages
         socket.emit("message", messages);
+        // On enregistre la socket qui est connectée
         clients[socket.id] = socket;
     });
-    console.log('Bonjour')
+
+    // Le serveur reçoit un message
     socket.on('message', (message) => {
+        // Ajout du message à l'historique
         messages.push(message)
-        console.log("liste des messages", messages)
+        // On contact tous les clients pour leur envoyer le nouveau message
         let tab_client = Object.keys(clients)
         tab_client.forEach(client => {
             clients[client].emit('message', messages)
         })
-        socket.emit("message", messages)
+        socket.emit("message", messages) // => Pas sûr que ce soit utile
     })
 });
-
-// // Chargement de socket.io
-// var io = require('socket.io').listen(app.listen(port));
-
-// // Quand un client se connecte, on le note dans la console
-// io.sockets.on('connection', function (socket) {
-//     console.log('Un client est connecté !');
-// });
