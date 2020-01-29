@@ -16,11 +16,12 @@
     <h1>Communication avec socket.io !</h1>
     <div class="conversation-container">
         <div class="main-conv" id="main-conv">
-
+            <!-- Cette espace accueillera nos messages -->
         </div>
         <div class="form-container">
             <div class="ui equal width grid">
                 <div class="column">
+                    <!-- Selection de l'avatar utilisé pour l'envoit -->
                     <div class="ui fluid selection dropdown">
                         <input type="hidden" name="user" id="user-selector">
                         <i class="dropdown icon"></i>
@@ -63,17 +64,24 @@
 
     <script>
         $('.ui.dropdown').dropdown();
+        /*
+            On crée une socket qui se connecte au serveur qui est en écoute sur le port 8080.
+        */
         var socket = io.connect('http://localhost:8080');
-
+        socket.emit('ready')
         // Non utilisé mais le serveur peut forcer un reload de la page
         socket.on('reload', function (data) {
             console.log("Je reçois un ordre de reload")
             location.reload();
         });
 
+        /*
+            On reçoit un message (la liste des messages) de la part du serveur.
+        */
         socket.on('message', function (data) {
-            console.log(data)
+            // On vide tous les messages pour les "redessiner", cette methode peut être ameliorée
             document.getElementById('main-conv').innerHTML = ""
+            // Pour chaque message on remplit notre conversation avec le code HTML
             data.forEach(message => {
                 let author = ""
                 if (message.author == "dp") {
@@ -83,10 +91,16 @@
                 }
                 document.getElementById('main-conv').innerHTML += "<div class='ui cards'><div class='card message-card'><div class='content'><img class='right floated mini ui image' src='/assets/images/" + message.author + ".png'><div class='header'>" + author + "</div><div class='meta'>" + message.date + "</div><div class='description'>" + message.message + "</div></div></div></div>"
             });
+            // Si la conversation n'est pas en bas une fois qu'on a reçu le message, on descend automatiquement
             let conv_container = document.getElementById('main-conv');
             conv_container.scrollTop = conv_container.scrollHeight - conv_container.clientHeight;
+
         });
 
+        /*
+            EventListener sur le bouton "envoyer" pour envoyer notre message au serveur et que ce dernier soit transmis.
+            On pourrait ajouter un listener sur la touche ENTRER pour envoyer sans cliquer sur le bouton.
+        */
         document.getElementById("send-button").addEventListener("click", (MouseEvent) => {
             let message = document.getElementById("message-container").value
             let author = document.getElementById("user-selector").value
@@ -97,7 +111,6 @@
             socket.emit('message', { "message": message, "author": author, "date": datestr })
             document.getElementById("message-container").value = "";
         })
-        socket.emit('ready')
     </script>
 </body>
 
