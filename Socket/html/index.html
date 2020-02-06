@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+
+    <script src="/socket.io/socket.io.js"></script>
+</head>
+
+<body>
+
+    <nav id="menu">
+
+    </nav>
+    
+    <script>
+        var socket = io.connect('http://localhost:8080');
+
+        socket.emit('menu', function (data) {
+            console.log("Je reçois un ordre de reload")
+            alert(data)
+        });
+
+        socket.on('menu', (menu) => {
+            console.log("je reçois le menu")
+            document.getElementById('menu').innerHTML += "<ul><li><a class='active'>"+menu[0].label+"</a></li><li><a href='#news'>"+menu[1].label+"</a></li>"
+                +"<li><a href='#contact'>"+menu[2].label+"</a></li>"
+                +"<li><a href='#about'>"+menu[3].label+"</a></li></ul>"
+        })
+    </script>
+
+    <h1>Coucou tout le monde</h1>
+
+
+
+</body>
+
+</html>
